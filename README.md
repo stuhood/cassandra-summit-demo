@@ -8,11 +8,13 @@ Flow:
 > hadoop dfs -put <local> <data>
 
 2. Use Hadoop Streaming to add structure and insert into Cassandra
-> bin/load -input <data>
+> bin/load -input <in>
 
-3. Summarize data with Pig back into HDFS
-4. Use Java MapReduce to store results in Cassandra
+3. Summarize data with Pig into HDFS
+> TODO:
+> bin/summarize -input <in> -output <out>
 
+4. Use Java MapReduce to store results back into Cassandra
 
 Dependencies:
 # FIXME: Load Cassandra JARs from Cassandra install path

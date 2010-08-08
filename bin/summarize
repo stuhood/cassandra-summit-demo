@@ -18,26 +18,19 @@
 
 rootdir=`cd $(dirname $0)/.. ; pwd`
 
-JAR=`ls -1 "$rootdir/lib/"hadoop-streaming*.jar`
-ARCHIVES=$JAR
+export PIG_HOME=`ls -d -1 ~/src/pig`
+export JAVA_HOME=/usr/lib/jvm/java-6-sun
+
 for jar in `ls -1 "$rootdir/lib"`; do
-    ARCHIVES=$ARCHIVES,"$rootdir/lib/$jar"
+    CLASSPATH=$CLASSPATH:"$rootdir/lib/$jar"
 done
 
-hadoop jar "$JAR" \
-    -D mapred.reduce.tasks=0 \
-    -D stream.map.output=cassandra_avro_output \
-    -D stream.io.identifier.resolver.class=org.apache.cassandra.hadoop.streaming.AvroResolver \
-    -D cassandra.output.keyspace=Keyspace1 \
-    -D cassandra.output.columnfamily=Standard1 \
-    -D cassandra.partitioner.class=org.apache.cassandra.dht.RandomPartitioner \
-    -D cassandra.thrift.address=127.0.0.1 \
-    -D cassandra.thrift.port=9160 \
-    -D mapreduce.output.columnfamilyoutputformat.batch.threshold=4096 \
-    -libjars $ARCHIVES \
-    -file "$rootdir/src/main/resources/cassandra.avpr" \
-    -outputformat org.apache.cassandra.hadoop.ColumnFamilyOutputFormat \
-    -output /tmp/ignored \
-    -mapper $rootdir/bin/load-mapper.py \
-    $*
+export PIG_CLASSPATH=$PIG_CLASSPATH:$CLASSPATH
+export PIG_OPTS=$PIG_OPTS" -Dudf.import.list=org.apache.cassandra.hadoop.pig"
 
+export PIG_RPC_PORT="9160"
+export PIG_INITIAL_ADDRESS="127.0.0.1"
+export PIG_PARTITIONER="org.apache.cassandra.dht.RandomPartitioner"
+# FIXME
+# cat "$rootdir/bin/summarize.pig" - | $PIG_HOME/bin/pig $*
+$PIG_HOME/bin/pig $*

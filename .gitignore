@@ -1,5 +1,6 @@
 target
 lib_managed
+lib/*.jar
 src_managed
 src/main/java
 project/boot

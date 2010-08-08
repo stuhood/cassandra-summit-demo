@@ -32,8 +32,8 @@ writer = DatumWriter(schema)
 
 def column(name, value):
     column = dict()
-    column['name'] = '%s' % name
-    column['value'] = '%s' % value
+    column['name'] = name
+    column['value'] = value
     column['clock'] = {'timestamp': long(time.time() * 1e6)}
     column['ttl'] = 0
     return column
@@ -41,7 +41,7 @@ def column(name, value):
 # parse top level yaml records and output a series of objects matching
 # 'StreamingMutation' in the Avro interface
 mutation = dict()
-mutation['mutation'] = {COSC: {'column': None}}
+mutation['mutation'] = {COSC: {'column': column(None, None)}}
 try:
     iter = yaml.parse(sys.stdin)
     while True:
@@ -56,7 +56,8 @@ try:
             else:
                 # new column
                 value = event.value.encode()
-                mutation['mutation'][COSC]['column'] = column(scalar, value)
+                mutation['mutation'][COSC]['column']['name'] = scalar
+                mutation['mutation'][COSC]['column']['value'] = value
                 # flush the mutation
                 writer.write(mutation, enc)
 except StopIteration:
