@@ -18,11 +18,13 @@
 
 package summit
 
+import scala.collection.JavaConversions.asIterable
+
+import java.util.List
 import java.nio.ByteBuffer
 
-import org.apache.cassandra.avro.Mutation
-import org.apache.cassandra.hadoop.ColumnFamilyOutputFormat
-import org.apache.cassandra.hadoop.ConfigHelper
+import org.apache.cassandra.avro.{Mutation, Column, ColumnOrSuperColumn, Clock}
+import org.apache.cassandra.hadoop.{ColumnFamilyOutputFormat, ConfigHelper}
 
 import org.apache.hadoop.conf.{Configured, Configuration}
 import org.apache.hadoop.io.Text
@@ -33,13 +35,35 @@ class Summarize extends Configured with Tool {
     val KEYSPACE = "Summit"
     val COLUMN_FAMILY = "Regnums"
 
+    val EMPTY_BYTES = ByteBuffer.allocate(0)
+
     /**
      * Converts per-key entries into mutations which the OutputFormat will execute.
      * TODO: Generic parameters depend on input
      */
     class MutationReducer extends Reducer[Text, Text, ByteBuffer, List[Mutation]] {
-        override def reduce(key: Text, values: java.lang.Iterable[Text], context: Reducer[Text, Text, ByteBuffer, List[Mutation]]#Context): Unit = {
-            // build mutations for each key
+        def wrap(value: Text): ByteBuffer =
+            ByteBuffer.wrap(value.getBytes(), 0, value.getLength())
+
+        def mutation(name: Text): Mutation = {
+            val col = new Column
+            col.name = wrap(name)
+            col.value = EMPTY_BYTES
+            col.clock = new Clock
+            col.clock.timestamp = System.currentTimeMillis * 1000
+            col.ttl = 0
+            val mut = new Mutation
+            mut.column_or_supercolumn = new ColumnOrSuperColumn
+            mut.column_or_supercolumn.column = col
+            return mut
+        }
+
+        override def reduce(key: Text, values: java.lang.Iterable[Text], context: Reducer[Text, Text, ByteBuffer, List[Mutation]]#Context) = {
+            // build mutations for the key
+            val mutations = new java.util.ArrayList[Mutation]
+            for (value <- values)
+                mutations.add(mutation(value))
+            context.write(wrap(key), mutations)
         }
     }
 
