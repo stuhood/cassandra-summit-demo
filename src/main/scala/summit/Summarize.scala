@@ -39,7 +39,6 @@ class Summarize extends Configured with Tool {
 
     /**
      * Converts per-key entries into mutations which the OutputFormat will execute.
-     * TODO: Generic parameters depend on input
      */
     class MutationReducer extends Reducer[Text, Text, ByteBuffer, List[Mutation]] {
         def wrap(value: Text): ByteBuffer =
@@ -71,12 +70,10 @@ class Summarize extends Configured with Tool {
         val job = new Job(getConf(), "summarize")
         job.setJarByClass(classOf[Summarize])
         job.setReducerClass(classOf[MutationReducer])
-        // TODO: Generic parameters depend on input
         job.setOutputKeyClass(classOf[ByteBuffer])
         job.setOutputValueClass(classOf[List[Mutation]])
         job.setOutputFormatClass(classOf[ColumnFamilyOutputFormat])
 
-        // TODO: Target CF for secondary index
         ConfigHelper.setOutputColumnFamily(job.getConfiguration(), KEYSPACE, COLUMN_FAMILY)
 
         return if (job.waitForCompletion(true)) 0 else 1

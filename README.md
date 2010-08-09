@@ -24,7 +24,8 @@ Dependencies:
 * Cassandra 0.7.0-SNAPSHOT
 * PyYAML
 * Avro 1.3.3 Python
-* Cloudera DH2: Hadoop Streaming, Apache Pig
+* Simple Build Tool (sbt)
+* Cloudera DH3: Hadoop Streaming, Apache Pig
 
 Thank you to Infochimps for the carefully scraped Wikipedia dataset:
 http://infochimps.org/datasets/taxobox-wikipedia-infoboxes-with-taxonomic-information-on-animal
