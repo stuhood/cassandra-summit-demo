@@ -1,5 +1,5 @@
 
-rows = LOAD 'cassandra://Summit/Demo' USING CassandraStorage()
+rows = LOAD 'cassandra://Summit/Taxoboxes' USING CassandraStorage()
      AS (key:bytearray, cols:bag{col:tuple(name:bytearray, value:bytearray)});
 cols = FOREACH rows GENERATE key, flatten(cols) AS (name, value);
 regnumcols = FILTER cols BY name == 'regnum';

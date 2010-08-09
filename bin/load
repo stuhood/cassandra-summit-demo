@@ -29,7 +29,7 @@ hadoop jar "$JAR" \
     -D stream.map.output=cassandra_avro_output \
     -D stream.io.identifier.resolver.class=org.apache.cassandra.hadoop.streaming.AvroResolver \
     -D cassandra.output.keyspace=Summit \
-    -D cassandra.output.columnfamily=Demo \
+    -D cassandra.output.columnfamily=Taxoboxes \
     -D cassandra.partitioner.class=org.apache.cassandra.dht.ByteOrderedPartitioner \
     -D cassandra.thrift.address=10.4.206.13 \
     -D cassandra.thrift.port=9160 \

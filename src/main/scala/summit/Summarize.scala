@@ -18,44 +18,49 @@
 
 package summit
 
+import java.nio.ByteBuffer
+
+import org.apache.cassandra.avro.Mutation
+import org.apache.cassandra.hadoop.ColumnFamilyOutputFormat
+import org.apache.cassandra.hadoop.ConfigHelper
+
 import org.apache.hadoop.conf.{Configured, Configuration}
+import org.apache.hadoop.io.Text
+import org.apache.hadoop.mapreduce.{Job, Reducer, ReduceContext}
 import org.apache.hadoop.util.{Tool, ToolRunner}
 
-object Summarize extends Configured with Tool {
+class Summarize extends Configured with Tool {
+    val KEYSPACE = "Summit"
+    val COLUMN_FAMILY = "Regnums"
 
     /**
      * Converts per-key entries into mutations which the OutputFormat will execute.
      * TODO: Generic parameters depend on input
      */
     class MutationReducer extends Reducer[Text, Text, ByteBuffer, List[Mutation]] {
-        override def reduce(k: Text, v: Iterable[Text], context: Context): Unit {
+        override def reduce(key: Text, values: java.lang.Iterable[Text], context: Reducer[Text, Text, ByteBuffer, List[Mutation]]#Context): Unit = {
             // build mutations for each key
         }
     }
 
-    override def run(args: Array[String]): Int {
-        val job = new Job(getConf(), "wordcount")
-        job.setJarByClass(Markset.class)
-        // TODO: Depending on input, may need a mapper to set key properly
-        job.setMapperClass(TokenizerMapper.class)
-        job.setReducerClass(MutationReducer.class)
+    override def run(args: Array[String]): Int = {
+        val job = new Job(getConf(), "summarize")
+        job.setJarByClass(classOf[Summarize])
+        job.setReducerClass(classOf[MutationReducer])
         // TODO: Generic parameters depend on input
-        job.setOutputKeyClass(Text.class)
-        job.setOutputValueClass(IntWritable.class)
-
-        // TODO: Find InputFormat to interface with PigStorage
-        job.setInputFormatClass(ColumnFamilyInputFormat.class)
-        job.setOutputFormatClass(ColumnFamilyOutputFormat.class)
+        job.setOutputKeyClass(classOf[ByteBuffer])
+        job.setOutputValueClass(classOf[List[Mutation]])
+        job.setOutputFormatClass(classOf[ColumnFamilyOutputFormat])
 
         // TODO: Target CF for secondary index
         ConfigHelper.setOutputColumnFamily(job.getConfiguration(), KEYSPACE, COLUMN_FAMILY)
 
-        job.waitForCompletion(true)
+        return if (job.waitForCompletion(true)) 0 else 1
     }
 
-    def main(args: Array[String]): Unit {
+    def main(args: Array[String]): Unit = {
         // let ToolRunner handle generic command-line options
-        ToolRunner.run(new Configuration(), new WordCount(), args)
+        ToolRunner.run(new Configuration, new Summarize, args)
     }
 }
 
