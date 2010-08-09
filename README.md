@@ -13,17 +13,15 @@ Flow:
 > bin/load -input <in>
 
 3. Summarize data with Pig into HDFS
-> TODO:
-
-> bin/summarize -input <in> -output <out>
+> cat bin/summarize.pig | bin/summarize
 
 4. Use Java MapReduce to store results back into Cassandra
+> TODO
 
 Dependencies:
 ----
 
-FIXME: Load Cassandra JARs from Cassandra install path
-
+* Cassandra 0.7.0-SNAPSHOT
 * PyYAML
 * Avro 1.3.3 Python
 * Cloudera DH2: Hadoop Streaming, Apache Pig

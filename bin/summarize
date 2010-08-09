@@ -20,17 +20,17 @@ rootdir=`cd $(dirname $0)/.. ; pwd`
 
 export PIG_HOME=`ls -d -1 ~/src/pig`
 export JAVA_HOME=/usr/lib/jvm/java-6-sun
+export PIG_CONF_DIR=`ls -d -1 ~/src/hadoop/conf`
 
+REG_PIG="/tmp/register.pig"
+echo > $REG_PIG
 for jar in `ls -1 "$rootdir/lib"`; do
     CLASSPATH=$CLASSPATH:"$rootdir/lib/$jar"
+    echo "register $rootdir/lib/$jar;" >> $REG_PIG
 done
 
 export PIG_CLASSPATH=$PIG_CLASSPATH:$CLASSPATH
 export PIG_OPTS=$PIG_OPTS" -Dudf.import.list=org.apache.cassandra.hadoop.pig"
 
-export PIG_RPC_PORT="9160"
-export PIG_INITIAL_ADDRESS="127.0.0.1"
-export PIG_PARTITIONER="org.apache.cassandra.dht.RandomPartitioner"
-# FIXME
-# cat "$rootdir/bin/summarize.pig" - | $PIG_HOME/bin/pig $*
-$PIG_HOME/bin/pig $*
+cat "$REG_PIG" - | $PIG_HOME/bin/pig $*
+
