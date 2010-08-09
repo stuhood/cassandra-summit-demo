@@ -18,10 +18,19 @@
 
 rootdir=`cd $(dirname $0)/.. ; pwd`
 
+export PIG_HOME=`ls -d -1 ~/src/pig`
 export JAVA_HOME=/usr/lib/jvm/java-6-sun
+export PIG_CONF_DIR=`ls -d -1 ~/src/hadoop/conf`
+
+REG_PIG="/tmp/register.pig"
+echo > $REG_PIG
 for jar in `ls -1 "$rootdir/lib"`; do
     CLASSPATH=$CLASSPATH:"$rootdir/lib/$jar"
+    echo "register $rootdir/lib/$jar;" >> $REG_PIG
 done
 
-java -Xmx1G -cp $CLASSPATH summit.Summarize
+export PIG_CLASSPATH=$PIG_CLASSPATH:$CLASSPATH
+export PIG_OPTS=$PIG_OPTS" -Dudf.import.list=org.apache.cassandra.hadoop.pig"
+
+cat "$REG_PIG" - | $PIG_HOME/bin/pig $*
 

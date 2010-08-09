@@ -12,11 +12,11 @@ Flow:
 2. Use Hadoop Streaming to add structure and insert into Cassandra
 > bin/load -input <in>
 
-3. Summarize data with Pig into HDFS
-> cat bin/summarize.pig | bin/summarize
+3. Analyze data with Pig into HDFS
+> cat bin/analyze.pig | bin/analyze
 
-4. Use Java MapReduce to store results back into Cassandra
-> TODO
+4. Use Java MapReduce to store summary results back into Cassandra
+> bin/summarize
 
 Dependencies:
 ----
