@@ -11,6 +11,6 @@ DUMP regnumcounts;
 
 -- store sorted regnums
 regnums = FOREACH regnumcols GENERATE value, key;
-orderedregnums = ORDER regnumcols BY value;
+orderedregnums = ORDER regnums BY value;
 STORE orderedregnums INTO 'summarized';
 

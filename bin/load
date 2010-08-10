@@ -25,19 +25,21 @@ for jar in `ls -1 "$rootdir/lib"`; do
 done
 
 hadoop jar "$JAR" \
+    -D mapred.map.tasks=4 \
     -D mapred.reduce.tasks=0 \
     -D stream.map.output=cassandra_avro_output \
     -D stream.io.identifier.resolver.class=org.apache.cassandra.hadoop.streaming.AvroResolver \
     -D cassandra.output.keyspace=Summit \
     -D cassandra.output.columnfamily=Taxoboxes \
     -D cassandra.partitioner.class=org.apache.cassandra.dht.ByteOrderedPartitioner \
-    -D cassandra.thrift.address=10.4.206.13 \
+    -D cassandra.thrift.address=174.143.147.200 \
     -D cassandra.thrift.port=9160 \
     -D mapreduce.output.columnfamilyoutputformat.batch.threshold=4096 \
     -libjars $ARCHIVES \
     -file "$rootdir/src/main/resources/cassandra.avpr" \
+    -file "$rootdir/bin/load-mapper.py" \
     -outputformat org.apache.cassandra.hadoop.ColumnFamilyOutputFormat \
     -output /tmp/ignored \
-    -mapper $rootdir/bin/load-mapper.py \
+    -mapper load-mapper.py \
     $*
 

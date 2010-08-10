@@ -18,9 +18,7 @@
 
 rootdir=`cd $(dirname $0)/.. ; pwd`
 
-export PIG_HOME=`ls -d -1 ~/src/pig`
-export JAVA_HOME=/usr/lib/jvm/java-6-sun
-export PIG_CONF_DIR=`ls -d -1 ~/src/hadoop/conf`
+export JAVA_HOME="/usr/java/jdk1.6.0_21"
 
 REG_PIG="/tmp/register.pig"
 echo > $REG_PIG
@@ -32,5 +30,5 @@ done
 export PIG_CLASSPATH=$PIG_CLASSPATH:$CLASSPATH
 export PIG_OPTS=$PIG_OPTS" -Dudf.import.list=org.apache.cassandra.hadoop.pig"
 
-cat "$REG_PIG" - | $PIG_HOME/bin/pig $*
+cat "$REG_PIG" - | pig $*
 

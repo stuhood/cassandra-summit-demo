@@ -7,10 +7,10 @@ Flow:
 ----
 
 1. Load unstructured data into HDFS
-> hadoop dfs -put <local> <data>
+> hadoop dfs -put taxobox*.yaml /user/hadoop
 
 2. Use Hadoop Streaming to add structure and insert into Cassandra
-> bin/load -input <in>
+> bin/load -input /user/hadoop/taxobox*.yaml
 
 3. Analyze data with Pig into HDFS
 > cat bin/analyze.pig | bin/analyze

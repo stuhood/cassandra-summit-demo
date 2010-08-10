@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python26
 
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -62,6 +62,6 @@ try:
                 writer.write(mutation, enc)
 except StopIteration:
     pass
-finally:
-    sys.stdout.flush()
+
+sys.stdout.flush()
 
